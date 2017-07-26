@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import re
 import sys
@@ -6,6 +7,7 @@ import threading
 def getNumbersInText(text):
     return re.findall(r"(-?\d+)", text)
 
+# 获取需修复的键空间名称keyspaceAndCF，总的需修复条数totalRangeNum 和已修复的条数等数据repairedNum
 fp = open(sys.argv[2], 'r')
 ip = sys.argv[1]
 text = fp.read()
@@ -21,6 +23,10 @@ hasFailure = False
 fpFailed = open(sys.argv[2][:-4] + "_failed.txt", "w")
 fpFailed.write(keyspaceAndCF + '\n')
 
+# 手动停止修复
+# terminateThread一直因等待输入而阻塞
+# 获得输入后，将terminateProcess置为True，从而终止主进程
+# 同时将需要存储的信息存入文件
 terminateProcess = False
 def terminateProcessManually():
     print raw_input()
@@ -38,7 +44,7 @@ def terminateProcessManually():
 terminateThread = threading.Thread(target=terminateProcessManually)
 terminateThread.start()
 
-# Repair all ranges that need to be repaired
+# 逐条修复需要修复的ranges
 for i in range(repairedNum + 1, totalRangeNum + 1):
     if terminateProcess == True:
         print "xxxRepair is terminated manually"
