@@ -23,7 +23,8 @@ deadNode = set()
 for i in range(5, len(text) - 1):
     if "DN" in text[i]:
         deadNode.add(getIpInText(text[i]))
-    ipToRange[getIpInText(text[i])] = set()
+    else:
+        ipToRange[getIpInText(text[i])] = set()
 
 # 若没有节点死亡，则无需进行之后的任何操作
 if len(deadNode) == 0:

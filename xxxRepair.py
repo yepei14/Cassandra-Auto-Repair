@@ -18,7 +18,12 @@ totalRangeNum = len(text) - logNum - 2
 keyspaceAndCF = text[0]
 repairedNum = int(getNumbersInText(text[-2])[0])
 
-print "xxxRepair : Repairing all ranges that need to be repaired"
+# 若totalRangeNum与repairedNum相等，则所有修复已完成
+if repairedNum == totalRangeNum:
+    print "All ranges have been repaired!"
+    sys.exit(0)
+
+print "xxxRepair : Repairing all ranges that need to be repaired on node " + sys.argv[1]
 hasFailure = False
 fpFailed = open(sys.argv[2][:-4] + "_failed.txt", "w")
 fpFailed.write(keyspaceAndCF + '\n')
@@ -50,16 +55,17 @@ for i in range(repairedNum + 1, totalRangeNum + 1):
         print "xxxRepair is terminated manually"
         break
     print "Repairing range " + str(repairedNum + 1) + " ..."
-    log = os.popen("nodetool -h %s repair -st %s -et %s %s" % (ip,\
+    log = os.popen("./nodetool -h %s repair -st %s -et %s %s" % (ip,\
             getNumbersInText(text[i])[0], getNumbersInText(text[i])[1], keyspaceAndCF)).read()
     repairedNum = repairedNum + 1
     if "successfully" in log:
         print str(repairedNum) + " / " + str(totalRangeNum) + " has been repaired successfully"
     else:
         hasFailure = True
-        print "Failed to repair range " + str(repairedNum)
+        print "Failed to repair range " + str(repairedNum) + " / " + str(totalRangeNum)
         print log
-        fpFailed.write(getNumbersInText(text[i])[0] + " " + getNumbersInText(text[i])[1] + "\n")
+        if fpFailed.closed != True:
+            fpFailed.write(getNumbersInText(text[i])[0] + " " + getNumbersInText(text[i])[1] + "\n")
     print "Press Enter to terminate the process"
 
 if hasFailure:
